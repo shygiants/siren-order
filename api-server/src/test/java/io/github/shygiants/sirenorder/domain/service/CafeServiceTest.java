@@ -5,7 +5,6 @@ import io.github.shygiants.sirenorder.domain.repository.CafeRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatcher;
 
 import java.util.Optional;
 
@@ -25,7 +24,7 @@ class CafeServiceTest {
     }
 
     @Test
-    void getCafeIfCafeExists() {
+    void testGetCafeIfCafeExists() {
         // GIVEN
         when(cafeRepository.findById(CafeService.CAFE_ID)).thenReturn(Optional.of(this.cafe));
 
@@ -38,7 +37,7 @@ class CafeServiceTest {
     }
 
     @Test
-    void getCafeIfCafeNotExists() {
+    void testGetCafeIfCafeNotExists() {
         // GIVEN
         when(cafeRepository.findById(CafeService.CAFE_ID)).thenReturn(Optional.empty());
         when(cafeRepository.save(any(Cafe.class))).then(invocationOnMock -> invocationOnMock.getArgument(0));

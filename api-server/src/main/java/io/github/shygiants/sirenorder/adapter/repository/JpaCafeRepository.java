@@ -1,4 +1,4 @@
-package io.github.shygiants.sirenorder.adapter;
+package io.github.shygiants.sirenorder.adapter.repository;
 
 import io.github.shygiants.sirenorder.domain.entity.Cafe;
 import io.github.shygiants.sirenorder.domain.repository.CafeRepository;

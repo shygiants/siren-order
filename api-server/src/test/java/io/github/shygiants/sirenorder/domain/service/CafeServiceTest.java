@@ -5,6 +5,7 @@ import io.github.shygiants.sirenorder.domain.repository.CafeRepository;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatcher;
 
 import java.util.Optional;
 
@@ -24,9 +25,9 @@ class CafeServiceTest {
     }
 
     @Test
-    void getCafe() {
+    void getCafeIfCafeExists() {
         // GIVEN
-        when(cafeRepository.findById(CafeService.CAFE_ID)).thenReturn(Optional.of(cafe));
+        when(cafeRepository.findById(CafeService.CAFE_ID)).thenReturn(Optional.of(this.cafe));
 
         // WHEN
         Cafe cafe = cafeService.getCafe();
@@ -34,5 +35,20 @@ class CafeServiceTest {
         // THEN
         Assertions.assertThat(cafe.getId()).isEqualTo(CafeService.CAFE_ID);
         verify(cafeRepository).findById(CafeService.CAFE_ID);
+    }
+
+    @Test
+    void getCafeIfCafeNotExists() {
+        // GIVEN
+        when(cafeRepository.findById(CafeService.CAFE_ID)).thenReturn(Optional.empty());
+        when(cafeRepository.save(any(Cafe.class))).then(invocationOnMock -> invocationOnMock.getArgument(0));
+
+        // WHEN
+        Cafe cafe = cafeService.getCafe();
+
+        // THEN
+        Assertions.assertThat(cafe.getId()).isEqualTo(CafeService.CAFE_ID);
+        verify(cafeRepository).findById(CafeService.CAFE_ID);
+        verify(cafeRepository).save(argThat(arg -> arg.getId().equals(CafeService.CAFE_ID)));
     }
 }

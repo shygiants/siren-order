@@ -1,0 +1,12 @@
+replicaCount: 1
+
+server:
+  port: 8080
+
+image:
+  repository: null
+  tag: null
+
+service:
+  type: LoadBalancer
+  port: 8080

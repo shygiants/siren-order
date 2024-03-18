@@ -1,0 +1,17 @@
+apiVersion: skaffold/v4beta1
+kind: Config
+metadata:
+  name: api-server
+build:
+  artifacts:
+    - image: api-server
+      docker:
+        dockerfile: Dockerfile
+manifests:
+  helm:
+    releases:
+      - name: api-server
+        chartPath: helm
+        setValueTemplates:
+          image.repository: "{{.IMAGE_REPO_api_server}}"
+          image.tag: "{{.IMAGE_TAG_api_server}}"

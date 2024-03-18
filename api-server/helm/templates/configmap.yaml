@@ -6,3 +6,6 @@ metadata:
     app: {{ .Chart.Name }}
 data:
   SERVER_PORT: "{{ .Values.server.port }}"
+  SPRING_DATASOURCE_DRIVERCLASSNAME: "com.mysql.cj.jdbc.Driver"
+  SPRING_DATASOURCE_URL: "jdbc:mysql://{{ .Values.mysql.fullnameOverride }}-headless:3306/{{ .Values.mysql.auth.database }}"
+  SPRING_DATASOURCE_USERNAME: "root"

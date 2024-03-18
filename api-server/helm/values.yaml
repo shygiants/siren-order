@@ -10,3 +10,9 @@ image:
 service:
   type: LoadBalancer
   port: 8080
+
+mysql:
+  fullnameOverride: api-server-mysql
+  auth:
+    rootPassword: password
+    database: sirenorder

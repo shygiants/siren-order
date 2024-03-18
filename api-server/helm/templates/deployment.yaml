@@ -22,6 +22,12 @@ spec:
           envFrom:
             - configMapRef:
                 name: {{ .Chart.Name }}
+          env:
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.mysql.fullnameOverride }}
+                  key: mysql-root-password
           livenessProbe:
             httpGet:
               path: /actuator/health

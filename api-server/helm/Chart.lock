@@ -2,5 +2,11 @@ dependencies:
 - name: mysql
   repository: https://charts.bitnami.com/bitnami
   version: 9.23.0
-digest: sha256:9049410c111ace23145690d1e13ef821955c73c49f6a0ecba0dd5c983407634e
-generated: "2024-03-19T01:31:20.158251+09:00"
+- name: prometheus
+  repository: https://prometheus-community.github.io/helm-charts
+  version: 25.17.0
+- name: grafana
+  repository: https://grafana.github.io/helm-charts
+  version: 7.3.7
+digest: sha256:a322b22e0f2d4d58649cd8bfa1547162a00c2334d875479a8e83ebe9fd9638bf
+generated: "2024-03-19T01:54:14.438555+09:00"

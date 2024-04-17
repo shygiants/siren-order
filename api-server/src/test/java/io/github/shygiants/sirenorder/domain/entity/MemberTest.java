@@ -2,8 +2,11 @@ package io.github.shygiants.sirenorder.domain.entity;
 
 import io.github.shygiants.sirenorder.domain.enumerate.Role;
 import io.github.shygiants.sirenorder.domain.valueobject.EmailAddress;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
 
 class MemberTest {
 
@@ -17,8 +20,30 @@ class MemberTest {
         Member customer = Member.createCustomer(emailAddress, password);
 
         // THEN
-        Assertions.assertThat(customer.getEmailAddress()).isEqualTo(emailAddress);
-        Assertions.assertThat(customer.getPassword()).isEqualTo(password);
-        Assertions.assertThat(customer.getRoles()).containsExactly(Role.CUSTOMER);
+        assertThat(customer.getEmailAddress()).isEqualTo(emailAddress);
+        assertThat(customer.getPassword()).isEqualTo(password);
+        assertThat(customer.getRoles()).containsExactly(Role.CUSTOMER);
+    }
+
+    @Test
+    void testCreateUserDetails() {
+        // GIVEN
+        String emailAddress = "test@example.com";
+        String password = "password";
+        Member customer = Member.createCustomer(new EmailAddress(emailAddress), password);
+
+        // WHEN
+        UserDetails userDetails = customer.createUserDetails();
+
+        // THEN
+        assertThat(userDetails.getAuthorities())
+                .hasSize(1)
+                .allMatch(grantedAuthority -> Role.fromAuthority(grantedAuthority).equals(Role.CUSTOMER));
+        assertThat(userDetails.getPassword()).isEqualTo(password);
+        assertThat(userDetails.getUsername()).isEqualTo(emailAddress);
+        assertThat(userDetails.isAccountNonExpired()).isTrue();
+        assertThat(userDetails.isAccountNonLocked()).isTrue();
+        assertThat(userDetails.isCredentialsNonExpired()).isTrue();
+        assertThat(userDetails.isEnabled()).isTrue();
     }
 }

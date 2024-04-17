@@ -1,8 +1,9 @@
 package io.github.shygiants.sirenorder.utils;
 
 import io.github.shygiants.sirenorder.domain.valueobject.EmailAddress;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 
 class EmailAddressConverterTest {
@@ -19,7 +20,7 @@ class EmailAddressConverterTest {
         EmailAddress reconstructed = converter.convertToEntityAttribute(converted);
 
         // THEN
-        Assertions.assertThat(reconstructed).isEqualTo(emailAddress);
+        assertThat(reconstructed).isEqualTo(emailAddress);
     }
 
     @Test
@@ -33,8 +34,8 @@ class EmailAddressConverterTest {
         EmailAddress reconstructed = converter.convertToEntityAttribute(converted);
 
         // THEN
-        Assertions.assertThat(converted).isNull();
-        Assertions.assertThat(reconstructed).isNull();
-        Assertions.assertThat(reconstructed).isEqualTo(emailAddress);
+        assertThat(converted).isNull();
+        assertThat(reconstructed).isNull();
+        assertThat(reconstructed).isEqualTo(emailAddress);
     }
 }

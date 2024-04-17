@@ -3,7 +3,6 @@ package io.github.shygiants.sirenorder.domain.service;
 import io.github.shygiants.sirenorder.domain.entity.Member;
 import io.github.shygiants.sirenorder.domain.repository.MemberRepository;
 import io.github.shygiants.sirenorder.domain.valueobject.EmailAddress;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -32,7 +31,7 @@ class MemberServiceTest {
     void testCreateCustomer() {
         // GIVEN
         when(memberRepository.save(any(Member.class))).then(invocationOnMock -> {
-            Member member = spy((Member) invocationOnMock.getArgument(0));
+            Member member = spy(invocationOnMock.getArgument(0, Member.class));
             when(member.getId()).thenReturn(MEMBER_ID);
             return member;
         });
@@ -67,6 +66,6 @@ class MemberServiceTest {
         // THEN
         verify(memberRepository).findByEmailAddress(new EmailAddress(emailAddress));
         assertThat(member).hasValueSatisfying(mem ->
-                Assertions.assertThat(mem.getEmailAddress().toString()).isEqualTo(emailAddress));
+                assertThat(mem.getEmailAddress().toString()).isEqualTo(emailAddress));
     }
 }

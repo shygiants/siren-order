@@ -1,8 +1,10 @@
 package io.github.shygiants.sirenorder.domain.valueobject;
 
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 
 class EmailAddressTest {
 
@@ -12,10 +14,10 @@ class EmailAddressTest {
         String validEmailAddress = "test@example.com";
 
         // WHEN
-        Throwable throwable = Assertions.catchThrowable(() -> new EmailAddress(validEmailAddress));
+        EmailAddress emailAddress = new EmailAddress(validEmailAddress);
 
         // THEN
-        Assertions.assertThat(throwable).isNull();
+        assertThat(emailAddress.toString()).isEqualTo(validEmailAddress);
     }
 
     @Test
@@ -24,10 +26,10 @@ class EmailAddressTest {
         String invalidEmailAddress = "test@example";
 
         // WHEN
-        Throwable throwable = Assertions.catchThrowable(() -> new EmailAddress(invalidEmailAddress));
+        Throwable throwable = catchThrowable(() -> new EmailAddress(invalidEmailAddress));
 
         // THEN
-        Assertions.assertThat(throwable)
+        assertThat(throwable)
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining(invalidEmailAddress);
     }

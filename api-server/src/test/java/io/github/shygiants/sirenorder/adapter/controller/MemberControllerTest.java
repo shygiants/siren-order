@@ -3,6 +3,7 @@ package io.github.shygiants.sirenorder.adapter.controller;
 import io.github.shygiants.sirenorder.domain.service.MemberService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
@@ -35,7 +36,7 @@ class MemberControllerTest {
         .when()
             .post("/api/v1/customers")
         .then()
-            .statusCode(200)
+            .status(HttpStatus.OK)
             .body("id", equalTo(MEMBER_ID.intValue()));
 
         verify(memberService).createCustomer(email, password);

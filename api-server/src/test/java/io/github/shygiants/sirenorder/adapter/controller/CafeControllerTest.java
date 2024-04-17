@@ -4,6 +4,7 @@ import io.github.shygiants.sirenorder.domain.entity.Cafe;
 import io.github.shygiants.sirenorder.domain.service.CafeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
@@ -30,7 +31,7 @@ class CafeControllerTest {
         .when()
             .get("/api/v1/cafe")
         .then()
-            .statusCode(200)
+            .status(HttpStatus.OK)
             .body("open", notNullValue());
         verify(cafeService).getCafe();
     }

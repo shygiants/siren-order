@@ -15,7 +15,7 @@ public class EmailAddressConverter implements AttributeConverter<EmailAddress, S
     public EmailAddress convertToEntityAttribute(String s) {
         try {
             return s == null ? null : new EmailAddress(s);
-        } catch (RuntimeException e) {
+        } catch (IllegalArgumentException e) {
             throw new RuntimeException("Failed to convert String to EmailAddress: " + s);
         }
     }

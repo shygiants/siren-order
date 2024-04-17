@@ -17,7 +17,7 @@ public class MemberService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public Long createCustomer(String email, String password) {
+    public Long createCustomer(String email, String password) throws IllegalArgumentException {
         // TODO: make email unique
         String encoded = passwordEncoder.encode(password);
         Member customer = Member.createCustomer(new EmailAddress(email), encoded);

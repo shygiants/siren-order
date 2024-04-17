@@ -1,5 +1,6 @@
 package io.github.shygiants.sirenorder.adapter.controller;
 
+import io.github.shygiants.sirenorder.adapter.controller.exceptions.BadRequestException;
 import io.github.shygiants.sirenorder.domain.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,9 +15,13 @@ public class MemberController {
 
     @PostMapping("/api/v1/customers")
     public CreateCustomerResponse createCustomer(@RequestBody CreateCustomerRequest request) {
-        Long createdCustomerId = memberService.createCustomer(request.emailAddress, request.password);
+        try {
+            Long createdCustomerId = memberService.createCustomer(request.emailAddress, request.password);
 
-        return new CreateCustomerResponse(createdCustomerId);
+            return new CreateCustomerResponse(createdCustomerId);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(e);
+        }
     }
 
     public record CreateCustomerResponse(Long id) {

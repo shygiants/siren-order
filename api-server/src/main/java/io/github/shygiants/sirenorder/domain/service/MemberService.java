@@ -1,6 +1,7 @@
 package io.github.shygiants.sirenorder.domain.service;
 
 import io.github.shygiants.sirenorder.domain.entity.Member;
+import io.github.shygiants.sirenorder.domain.enumerate.Role;
 import io.github.shygiants.sirenorder.domain.repository.MemberRepository;
 import io.github.shygiants.sirenorder.domain.valueobject.EmailAddress;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,13 @@ public class MemberService {
         }
     }
 
+    private void validateAtMostOneOwner() {
+        Optional<Member> memberOptional = memberRepository.findByRoles(Role.OWNER);
+        if (memberOptional.isPresent()) {
+            throw new OwnerAlreadyExistsException();
+        }
+    }
+
     private Long createMember(String email, String password, MemberFactory memberFactory) {
         EmailAddress emailAddress = new EmailAddress(email);
         validateUniqueEmailAddress(emailAddress);
@@ -42,6 +50,8 @@ public class MemberService {
     }
 
     public Long createOwner(String email, String password) throws IllegalArgumentException {
+        // TODO: Consider race condition
+        validateAtMostOneOwner();
         return createMember(email, password, Member::createOwner);
     }
 
@@ -52,6 +62,12 @@ public class MemberService {
     public static class DuplicateEmailAddressException extends IllegalArgumentException {
         public DuplicateEmailAddressException(EmailAddress emailAddress) {
             super("Duplicate email: " + emailAddress);
+        }
+    }
+
+    public static class OwnerAlreadyExistsException extends IllegalStateException {
+        public OwnerAlreadyExistsException() {
+            super("Owner already exists");
         }
     }
 

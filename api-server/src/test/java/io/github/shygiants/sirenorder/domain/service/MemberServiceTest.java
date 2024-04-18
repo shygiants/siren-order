@@ -1,6 +1,7 @@
 package io.github.shygiants.sirenorder.domain.service;
 
 import io.github.shygiants.sirenorder.domain.entity.Member;
+import io.github.shygiants.sirenorder.domain.enumerate.Role;
 import io.github.shygiants.sirenorder.domain.repository.MemberRepository;
 import io.github.shygiants.sirenorder.domain.valueobject.EmailAddress;
 import org.junit.jupiter.api.BeforeEach;
@@ -151,6 +152,30 @@ class MemberServiceTest {
         assertThat(throwable)
                 .isInstanceOf(MemberService.DuplicateEmailAddressException.class)
                 .hasMessageContaining(email);
+    }
+
+    @Test
+    void testCreateOwnerAllowsAtMostOne() {
+        // GIVEN
+        when(memberRepository.findByRoles(Role.OWNER)).thenReturn(Optional.of(mock(Member.class)));
+        when(memberRepository.findByEmailAddress(any())).thenReturn(Optional.empty());
+        when(memberRepository.save(any(Member.class))).then(invocationOnMock -> {
+            Member member = spy(invocationOnMock.getArgument(0, Member.class));
+            when(member.getId()).thenReturn(MEMBER_ID);
+            return member;
+        });
+        when(passwordEncoder.encode(any(String.class))).then(invocationOnMock -> invocationOnMock.getArgument(0));
+        String emailAddress = "test@example.com";
+        String password = "password";
+
+        // WHEN
+        Throwable throwable = catchThrowable(() -> memberService.createOwner(emailAddress, password));
+
+        // THEN
+        verify(memberRepository).findByRoles(Role.OWNER);
+        verify(passwordEncoder, never()).encode(anyString());
+        verify(memberRepository, never()).save(any());
+        assertThat(throwable).isInstanceOf(MemberService.OwnerAlreadyExistsException.class);
     }
 
 

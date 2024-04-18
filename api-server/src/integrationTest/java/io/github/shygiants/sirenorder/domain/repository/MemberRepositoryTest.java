@@ -1,6 +1,7 @@
 package io.github.shygiants.sirenorder.domain.repository;
 
 import io.github.shygiants.sirenorder.domain.entity.Member;
+import io.github.shygiants.sirenorder.domain.enumerate.Role;
 import io.github.shygiants.sirenorder.domain.valueobject.EmailAddress;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
@@ -54,6 +55,24 @@ public class MemberRepositoryTest {
         entityManager.close();
 
         Optional<Member> memberOptional = memberRepository.findByEmailAddress(customer.getEmailAddress());
+        assertThat(memberOptional).hasValue(customer);
+    }
+
+    @Test
+    void testSaveAndFindByRoles() {
+        Member customer = Member.createCustomer(
+                new EmailAddress("test@example.com"),
+                "password");
+
+        Member saved = memberRepository.save(customer);
+        entityManager.flush();
+
+        assertThat(saved).isEqualTo(customer);
+
+        entityManager.clear();
+        entityManager.close();
+
+        Optional<Member> memberOptional = memberRepository.findByRoles(Role.CUSTOMER);
         assertThat(memberOptional).hasValue(customer);
     }
 }

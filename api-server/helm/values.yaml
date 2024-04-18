@@ -11,6 +11,9 @@ service:
   type: LoadBalancer
   port: 8080
 
+security:
+  keyPairDir: /security
+
 mysql:
   fullnameOverride: api-server-mysql
   auth:

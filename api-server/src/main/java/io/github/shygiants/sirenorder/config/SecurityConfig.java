@@ -6,6 +6,8 @@ import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 import io.github.shygiants.sirenorder.domain.auth.JwtGenerator;
+import io.github.shygiants.sirenorder.utils.KeyPairLoader;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,7 +28,6 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
 import org.springframework.security.web.SecurityFilterChain;
 
 import java.security.KeyPair;
-import java.security.KeyPairGenerator;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Duration;
@@ -36,6 +37,13 @@ import java.util.UUID;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    @Value("${security.keypair.privatekey}")
+    private String privateKeyPath;
+
+    @Value("${security.keypair.publickey}")
+    private String publicKeyPath;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
@@ -67,8 +75,6 @@ public class SecurityConfig {
         return jwtAuthenticationConverter;
     }
 
-
-
     @Bean
     public AuthenticationManager authenticationManager(
             UserDetailsService userDetailsService,
@@ -81,15 +87,8 @@ public class SecurityConfig {
 
     @Bean
     public KeyPair keyPair() {
-        // TODO: get from external (config, env var or file)
-        try {
-            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
-            keyPairGenerator.initialize(2048);
-            return keyPairGenerator.generateKeyPair();
-        }
-        catch (Exception ex) {
-            throw new IllegalStateException(ex);
-        }
+        KeyPairLoader keyPairLoader = new KeyPairLoader(privateKeyPath, publicKeyPath);
+        return keyPairLoader.load();
     }
 
     @Bean

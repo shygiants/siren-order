@@ -42,6 +42,10 @@ public class Member {
         return new Member(emailAddress, password, Set.of(Role.CUSTOMER));
     }
 
+    public static Member createOwner(EmailAddress emailAddress, String password) {
+        return new Member(emailAddress, password, Set.of(Role.OWNER));
+    }
+
     public UserDetails createUserDetails() {
         return new MemberDetails(this);
     }

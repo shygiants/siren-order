@@ -35,7 +35,7 @@ class MemberControllerTest {
         given()
             .standaloneSetup(memberController)
             .contentType(MediaType.APPLICATION_JSON)
-            .body(new MemberController.CreateCustomerRequest(email, password))
+            .body(new MemberController.CreateMemberRequest(email, password))
         .when()
             .post("/api/v1/customers")
         .then()
@@ -54,16 +54,56 @@ class MemberControllerTest {
         String password = "password";
 
         given()
-            .standaloneSetup(memberController, exceptionHandler)
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(new MemberController.CreateCustomerRequest(email, password))
-        .when()
-            .post("/api/v1/customers")
-        .then()
-            .status(HttpStatus.BAD_REQUEST)
-            .body("msg", notNullValue());
+                .standaloneSetup(memberController, exceptionHandler)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new MemberController.CreateMemberRequest(email, password))
+                .when()
+                .post("/api/v1/customers")
+                .then()
+                .status(HttpStatus.BAD_REQUEST)
+                .body("msg", notNullValue());
 
         verify(memberService).createCustomer(email, password);
     }
 
+    @Test
+    void testCreateOwner() {
+        when(memberService.createOwner(anyString(), anyString())).thenReturn(MEMBER_ID);
+
+        String email = "test@example.com";
+        String password = "password";
+
+        given()
+            .standaloneSetup(memberController)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(new MemberController.CreateMemberRequest(email, password))
+        .when()
+            .post("/api/v1/owners")
+        .then()
+            .status(HttpStatus.OK)
+            .body("id", equalTo(MEMBER_ID.intValue()));
+
+        verify(memberService).createOwner(email, password);
+    }
+
+    @Test
+    void testCreateOwnerBadRequest() {
+        when(memberService.createOwner(anyString(), anyString())).thenThrow(
+                new IllegalArgumentException("invalid email"));
+
+        String email = "test@example";
+        String password = "password";
+
+        given()
+            .standaloneSetup(memberController, exceptionHandler)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(new MemberController.CreateMemberRequest(email, password))
+        .when()
+            .post("/api/v1/owners")
+        .then()
+            .status(HttpStatus.BAD_REQUEST)
+            .body("msg", notNullValue());
+
+        verify(memberService).createOwner(email, password);
+    }
 }

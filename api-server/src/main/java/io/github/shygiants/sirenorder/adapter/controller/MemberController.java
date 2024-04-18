@@ -14,21 +14,32 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("/api/v1/customers")
-    public CreateCustomerResponse createCustomer(@RequestBody CreateCustomerRequest request) {
+    public CreateMemberResponse createCustomer(@RequestBody CreateMemberRequest request) {
         try {
             Long createdCustomerId = memberService.createCustomer(request.emailAddress, request.password);
 
-            return new CreateCustomerResponse(createdCustomerId);
+            return new CreateMemberResponse(createdCustomerId);
         } catch (IllegalArgumentException e) {
             throw new BadRequestException(e);
         }
     }
 
-    public record CreateCustomerResponse(Long id) {
+    @PostMapping("/api/v1/owners")
+    public CreateMemberResponse createOwner(@RequestBody CreateMemberRequest request) {
+        try {
+            Long createdOwnerId = memberService.createOwner(request.emailAddress, request.password);
+
+            return new CreateMemberResponse(createdOwnerId);
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(e);
+        }
+    }
+
+    public record CreateMemberResponse(Long id) {
 
     }
 
-    public record CreateCustomerRequest(String emailAddress, String password) {
+    public record CreateMemberRequest(String emailAddress, String password) {
 
     }
 }

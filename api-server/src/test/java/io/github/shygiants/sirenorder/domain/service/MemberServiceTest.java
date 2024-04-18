@@ -52,6 +52,31 @@ class MemberServiceTest {
     }
 
     @Test
+    void testCreateOwner() {
+        // GIVEN
+        when(memberRepository.save(any(Member.class))).then(invocationOnMock -> {
+            Member member = spy(invocationOnMock.getArgument(0, Member.class));
+            when(member.getId()).thenReturn(MEMBER_ID);
+            return member;
+        });
+        when(passwordEncoder.encode(any(String.class))).then(invocationOnMock -> invocationOnMock.getArgument(0));
+        String emailAddress = "test@example.com";
+        String password = "password";
+
+        // WHEN
+        Long createdCustomerId = memberService.createOwner(emailAddress, password);
+
+        // THEN
+        verify(passwordEncoder).encode(password);
+        verify(memberRepository).save(argThat(mem -> mem.equals(
+                Member.createOwner(
+                        new EmailAddress(emailAddress),
+                        passwordEncoder.encode(password)))));
+        assertThat(createdCustomerId).isEqualTo(MEMBER_ID);
+    }
+
+
+    @Test
     void testFindMemberByEmailAddress() {
         // GIVEN
         when(memberRepository.findByEmailAddress(any(EmailAddress.class))).then(invocationOnMock -> {

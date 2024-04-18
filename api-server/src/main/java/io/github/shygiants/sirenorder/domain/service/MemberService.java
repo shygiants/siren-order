@@ -25,8 +25,16 @@ public class MemberService {
         return saved.getId();
     }
 
+    @Transactional
+    public Long createOwner(String email, String password) throws IllegalArgumentException {
+        // TODO: make email unique
+        String encoded = passwordEncoder.encode(password);
+        Member customer = Member.createOwner(new EmailAddress(email), encoded);
+        Member saved = memberRepository.save(customer);
+        return saved.getId();
+    }
+
     public Optional<Member> findMemberByEmailAddress(String email) {
         return memberRepository.findByEmailAddress(new EmailAddress(email));
     }
-
 }

@@ -26,6 +26,21 @@ class MemberTest {
     }
 
     @Test
+    void testCreateOwner() {
+        // GIVEN
+        EmailAddress emailAddress = new EmailAddress("test@example.com");
+        String password = "password";
+
+        // WHEN
+        Member customer = Member.createOwner(emailAddress, password);
+
+        // THEN
+        assertThat(customer.getEmailAddress()).isEqualTo(emailAddress);
+        assertThat(customer.getPassword()).isEqualTo(password);
+        assertThat(customer.getRoles()).containsExactly(Role.OWNER);
+    }
+
+    @Test
     void testCreateUserDetails() {
         // GIVEN
         String emailAddress = "test@example.com";

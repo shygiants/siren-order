@@ -23,6 +23,7 @@ public class Member {
     @GeneratedValue
     @Id
     private Long id;
+    @Column(unique = true)
     @Convert(converter = EmailAddressConverter.class)
     private EmailAddress emailAddress;
     private String password;

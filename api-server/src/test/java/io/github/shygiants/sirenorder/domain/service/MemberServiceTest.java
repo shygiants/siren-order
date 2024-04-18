@@ -5,11 +5,13 @@ import io.github.shygiants.sirenorder.domain.repository.MemberRepository;
 import io.github.shygiants.sirenorder.domain.valueobject.EmailAddress;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -30,6 +32,7 @@ class MemberServiceTest {
     @Test
     void testCreateCustomer() {
         // GIVEN
+        when(memberRepository.findByEmailAddress(any())).thenReturn(Optional.empty());
         when(memberRepository.save(any(Member.class))).then(invocationOnMock -> {
             Member member = spy(invocationOnMock.getArgument(0, Member.class));
             when(member.getId()).thenReturn(MEMBER_ID);
@@ -43,6 +46,7 @@ class MemberServiceTest {
         Long createdCustomerId = memberService.createCustomer(emailAddress, password);
 
         // THEN
+        verify(memberRepository).findByEmailAddress(new EmailAddress(emailAddress));
         verify(passwordEncoder).encode(password);
         verify(memberRepository).save(argThat(mem -> mem.equals(
                 Member.createCustomer(
@@ -52,8 +56,45 @@ class MemberServiceTest {
     }
 
     @Test
+    void testCreateCustomerUniqueEmailAddress() {
+        // GIVEN
+        when(memberRepository.findByEmailAddress(any())).thenReturn(Optional.of(mock(Member.class)));
+        when(memberRepository.save(any(Member.class))).thenThrow(new DataIntegrityViolationException(""));
+        when(passwordEncoder.encode(any(String.class))).thenReturn(anyString());
+        String email = "test@example.com";
+
+        // WHEN
+        Throwable throwable = catchThrowable(() -> memberService.createCustomer(email, "password"));
+
+        // THEN
+        verify(memberRepository, never()).save(any());
+        assertThat(throwable)
+                .isInstanceOf(MemberService.DuplicateEmailAddressException.class)
+                .hasMessageContaining(email);
+    }
+
+    @Test
+    void testCreateCustomerUniqueEmailAddressRaceCondition() {
+        // GIVEN
+        when(memberRepository.findByEmailAddress(any())).thenReturn(Optional.empty());
+        when(memberRepository.save(any(Member.class))).thenThrow(new DataIntegrityViolationException(""));
+        when(passwordEncoder.encode(any(String.class))).thenReturn(anyString());
+        String email = "test@example.com";
+
+        // WHEN
+        Throwable throwable = catchThrowable(() -> memberService.createCustomer(email, "password"));
+
+        // THEN
+        verify(memberRepository).save(any());
+        assertThat(throwable)
+                .isInstanceOf(MemberService.DuplicateEmailAddressException.class)
+                .hasMessageContaining(email);
+    }
+
+    @Test
     void testCreateOwner() {
         // GIVEN
+        when(memberRepository.findByEmailAddress(any())).thenReturn(Optional.empty());
         when(memberRepository.save(any(Member.class))).then(invocationOnMock -> {
             Member member = spy(invocationOnMock.getArgument(0, Member.class));
             when(member.getId()).thenReturn(MEMBER_ID);
@@ -67,12 +108,49 @@ class MemberServiceTest {
         Long createdCustomerId = memberService.createOwner(emailAddress, password);
 
         // THEN
+        verify(memberRepository).findByEmailAddress(new EmailAddress(emailAddress));
         verify(passwordEncoder).encode(password);
         verify(memberRepository).save(argThat(mem -> mem.equals(
                 Member.createOwner(
                         new EmailAddress(emailAddress),
                         passwordEncoder.encode(password)))));
         assertThat(createdCustomerId).isEqualTo(MEMBER_ID);
+    }
+
+    @Test
+    void testCreateOwnerUniqueEmailAddress() {
+        // GIVEN
+        when(memberRepository.findByEmailAddress(any())).thenReturn(Optional.of(mock(Member.class)));
+        when(memberRepository.save(any(Member.class))).thenThrow(new DataIntegrityViolationException(""));
+        when(passwordEncoder.encode(any(String.class))).thenReturn(anyString());
+        String email = "test@example.com";
+
+        // WHEN
+        Throwable throwable = catchThrowable(() -> memberService.createOwner(email, "password"));
+
+        // THEN
+        verify(memberRepository, never()).save(any());
+        assertThat(throwable)
+                .isInstanceOf(MemberService.DuplicateEmailAddressException.class)
+                .hasMessageContaining(email);
+    }
+
+    @Test
+    void testCreateOwnerUniqueEmailAddressRaceCondition() {
+        // GIVEN
+        when(memberRepository.findByEmailAddress(any())).thenReturn(Optional.empty());
+        when(memberRepository.save(any(Member.class))).thenThrow(new DataIntegrityViolationException(""));
+        when(passwordEncoder.encode(any(String.class))).thenReturn(anyString());
+        String email = "test@example.com";
+
+        // WHEN
+        Throwable throwable = catchThrowable(() -> memberService.createOwner(email, "password"));
+
+        // THEN
+        verify(memberRepository).save(any());
+        assertThat(throwable)
+                .isInstanceOf(MemberService.DuplicateEmailAddressException.class)
+                .hasMessageContaining(email);
     }
 
 

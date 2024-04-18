@@ -1,6 +1,7 @@
 package io.github.shygiants.sirenorder.adapter.controller;
 
 import io.github.shygiants.sirenorder.domain.service.MemberService;
+import io.github.shygiants.sirenorder.domain.valueobject.EmailAddress;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
@@ -54,14 +55,37 @@ class MemberControllerTest {
         String password = "password";
 
         given()
-                .standaloneSetup(memberController, exceptionHandler)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(new MemberController.CreateMemberRequest(email, password))
-                .when()
-                .post("/api/v1/customers")
-                .then()
-                .status(HttpStatus.BAD_REQUEST)
-                .body("msg", notNullValue());
+            .standaloneSetup(memberController, exceptionHandler)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(new MemberController.CreateMemberRequest(email, password))
+        .when()
+            .post("/api/v1/customers")
+        .then()
+            .status(HttpStatus.BAD_REQUEST)
+            .body("msg", notNullValue());
+
+        verify(memberService).createCustomer(email, password);
+    }
+
+    @Test
+    void testCreateCustomerConflict() {
+        when(memberService.createCustomer(anyString(), anyString())).then(invocationOnMock -> {
+            String argument = invocationOnMock.getArgument(0, String.class);
+            throw new MemberService.DuplicateEmailAddressException(new EmailAddress(argument));
+        });
+
+        String email = "test@example.com";
+        String password = "password";
+
+        given()
+            .standaloneSetup(memberController, exceptionHandler)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(new MemberController.CreateMemberRequest(email, password))
+        .when()
+            .post("/api/v1/customers")
+        .then()
+            .status(HttpStatus.CONFLICT)
+            .body("msg", notNullValue());
 
         verify(memberService).createCustomer(email, password);
     }
@@ -102,6 +126,29 @@ class MemberControllerTest {
             .post("/api/v1/owners")
         .then()
             .status(HttpStatus.BAD_REQUEST)
+            .body("msg", notNullValue());
+
+        verify(memberService).createOwner(email, password);
+    }
+
+    @Test
+    void testCreateOwnerConflict() {
+        when(memberService.createOwner(anyString(), anyString())).then(invocationOnMock -> {
+            String argument = invocationOnMock.getArgument(0, String.class);
+            throw new MemberService.DuplicateEmailAddressException(new EmailAddress(argument));
+        });
+
+        String email = "test@example.com";
+        String password = "password";
+
+        given()
+            .standaloneSetup(memberController, exceptionHandler)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(new MemberController.CreateMemberRequest(email, password))
+        .when()
+            .post("/api/v1/owners")
+        .then()
+            .status(HttpStatus.CONFLICT)
             .body("msg", notNullValue());
 
         verify(memberService).createOwner(email, password);

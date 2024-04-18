@@ -1,6 +1,7 @@
 package io.github.shygiants.sirenorder.adapter.controller;
 
 import io.github.shygiants.sirenorder.adapter.controller.exceptions.BadRequestException;
+import io.github.shygiants.sirenorder.adapter.controller.exceptions.ConflictException;
 import io.github.shygiants.sirenorder.domain.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,6 +20,8 @@ public class MemberController {
             Long createdCustomerId = memberService.createCustomer(request.emailAddress, request.password);
 
             return new CreateMemberResponse(createdCustomerId);
+        } catch (MemberService.DuplicateEmailAddressException e) {
+            throw new ConflictException(e);
         } catch (IllegalArgumentException e) {
             throw new BadRequestException(e);
         }
@@ -30,6 +33,8 @@ public class MemberController {
             Long createdOwnerId = memberService.createOwner(request.emailAddress, request.password);
 
             return new CreateMemberResponse(createdOwnerId);
+        } catch (MemberService.DuplicateEmailAddressException e) {
+            throw new ConflictException(e);
         } catch (IllegalArgumentException e) {
             throw new BadRequestException(e);
         }

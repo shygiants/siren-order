@@ -33,18 +33,37 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private Set<Role> roles;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name="CAFE_ID")
+    private Cafe cafe;
+
     private Member(EmailAddress emailAddress, String password, Set<Role> roles) {
+        this(emailAddress, password, roles, null);
+    }
+
+    private Member(EmailAddress emailAddress, String password, Set<Role> roles, Cafe cafe) {
         this.emailAddress = emailAddress;
         this.password = password;
         this.roles = roles;
+        this.cafe = cafe;
+
+        validateRoleAndCafeOwnership();
+    }
+
+    private void validateRoleAndCafeOwnership() {
+        if (roles.contains(Role.OWNER)) {
+            assert cafe != null;
+        } else {
+            assert cafe == null;
+        }
     }
 
     public static Member createCustomer(EmailAddress emailAddress, String password) {
         return new Member(emailAddress, password, Set.of(Role.CUSTOMER));
     }
 
-    public static Member createOwner(EmailAddress emailAddress, String password) {
-        return new Member(emailAddress, password, Set.of(Role.OWNER));
+    public static Member createOwner(EmailAddress emailAddress, String password, Cafe cafe) {
+        return new Member(emailAddress, password, Set.of(Role.OWNER), cafe);
     }
 
     public UserDetails createUserDetails() {

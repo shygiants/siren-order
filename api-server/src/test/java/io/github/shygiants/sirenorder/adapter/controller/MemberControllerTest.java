@@ -47,7 +47,7 @@ class MemberControllerTest {
     }
 
     @Test
-    void testCreateCustomerBadRequest() {
+    void testCreateCustomerInvalidEmailAddress() {
         when(memberService.createCustomer(anyString(), anyString())).thenThrow(
                 new IllegalArgumentException("invalid email"));
 
@@ -68,7 +68,7 @@ class MemberControllerTest {
     }
 
     @Test
-    void testCreateCustomerConflict() {
+    void testCreateCustomerDuplicateEmailAddress() {
         when(memberService.createCustomer(anyString(), anyString())).then(invocationOnMock -> {
             String argument = invocationOnMock.getArgument(0, String.class);
             throw new MemberService.DuplicateEmailAddressException(new EmailAddress(argument));
@@ -111,7 +111,7 @@ class MemberControllerTest {
     }
 
     @Test
-    void testCreateOwnerBadRequest() {
+    void testCreateOwnerInvalidEmailAddress() {
         when(memberService.createOwner(anyString(), anyString())).thenThrow(
                 new IllegalArgumentException("invalid email"));
 
@@ -132,11 +132,32 @@ class MemberControllerTest {
     }
 
     @Test
-    void testCreateOwnerConflict() {
+    void testCreateOwnerDuplicateEmailAddress() {
         when(memberService.createOwner(anyString(), anyString())).then(invocationOnMock -> {
             String argument = invocationOnMock.getArgument(0, String.class);
             throw new MemberService.DuplicateEmailAddressException(new EmailAddress(argument));
         });
+
+        String email = "test@example.com";
+        String password = "password";
+
+        given()
+            .standaloneSetup(memberController, exceptionHandler)
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(new MemberController.CreateMemberRequest(email, password))
+        .when()
+            .post("/api/v1/owners")
+        .then()
+            .status(HttpStatus.CONFLICT)
+            .body("msg", notNullValue());
+
+        verify(memberService).createOwner(email, password);
+    }
+
+    @Test
+    void testCreateOwnerAtMostOneOwnerPerCafe() {
+        when(memberService.createOwner(anyString(), anyString()))
+                .thenThrow(new MemberService.OwnerAlreadyExistsException());
 
         String email = "test@example.com";
         String password = "password";

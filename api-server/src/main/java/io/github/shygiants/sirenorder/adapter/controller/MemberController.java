@@ -33,7 +33,7 @@ public class MemberController {
             Long createdOwnerId = memberService.createOwner(request.emailAddress, request.password);
 
             return new CreateMemberResponse(createdOwnerId);
-        } catch (MemberService.DuplicateEmailAddressException e) {
+        } catch (MemberService.DuplicateEmailAddressException | MemberService.OwnerAlreadyExistsException e) {
             throw new ConflictException(e);
         } catch (IllegalArgumentException e) {
             throw new BadRequestException(e);

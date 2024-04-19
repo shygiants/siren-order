@@ -1,5 +1,6 @@
 package io.github.shygiants.sirenorder.domain.repository;
 
+import io.github.shygiants.sirenorder.domain.entity.Cafe;
 import io.github.shygiants.sirenorder.domain.entity.Member;
 import io.github.shygiants.sirenorder.domain.enumerate.Role;
 import io.github.shygiants.sirenorder.domain.valueobject.EmailAddress;
@@ -12,5 +13,5 @@ public interface MemberRepository {
     Optional<Member> findById(Long id);
 
     Optional<Member> findByEmailAddress(EmailAddress emailAddress);
-    Optional<Member> findByRoles(Role role);
+    Optional<Member> findByRolesAndCafe(Role role, Cafe cafe);
 }

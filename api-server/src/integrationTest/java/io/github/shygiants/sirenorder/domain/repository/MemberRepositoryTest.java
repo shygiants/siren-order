@@ -1,7 +1,9 @@
 package io.github.shygiants.sirenorder.domain.repository;
 
+import io.github.shygiants.sirenorder.domain.entity.Cafe;
 import io.github.shygiants.sirenorder.domain.entity.Member;
 import io.github.shygiants.sirenorder.domain.enumerate.Role;
+import io.github.shygiants.sirenorder.domain.service.CafeService;
 import io.github.shygiants.sirenorder.domain.valueobject.EmailAddress;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
@@ -19,6 +21,8 @@ public class MemberRepositoryTest {
 
     @Autowired
     MemberRepository memberRepository;
+    @Autowired
+    CafeService cafeService;
     @Autowired
     EntityManager entityManager;
 
@@ -59,20 +63,24 @@ public class MemberRepositoryTest {
     }
 
     @Test
-    void testSaveAndFindByRoles() {
-        Member customer = Member.createCustomer(
-                new EmailAddress("test@example.com"),
-                "password");
-
-        Member saved = memberRepository.save(customer);
+    void testSaveAndFindByRolesAndCafe() {
+        Cafe cafe = cafeService.getCafe();
         entityManager.flush();
 
-        assertThat(saved).isEqualTo(customer);
+        Member owner = Member.createOwner(
+                new EmailAddress("test@example.com"),
+                "password",
+                cafe);
+
+        Member saved = memberRepository.save(owner);
+        entityManager.flush();
+
+        assertThat(saved).isEqualTo(owner);
 
         entityManager.clear();
         entityManager.close();
 
-        Optional<Member> memberOptional = memberRepository.findByRoles(Role.CUSTOMER);
-        assertThat(memberOptional).hasValue(customer);
+        Optional<Member> memberOptional = memberRepository.findByRolesAndCafe(Role.OWNER, cafe);
+        assertThat(memberOptional).hasValue(owner);
     }
 }

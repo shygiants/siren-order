@@ -23,6 +23,7 @@ class MemberTest {
         assertThat(customer.getEmailAddress()).isEqualTo(emailAddress);
         assertThat(customer.getPassword()).isEqualTo(password);
         assertThat(customer.getRoles()).containsExactly(Role.CUSTOMER);
+        assertThat(customer.getCafe()).isNull();
     }
 
     @Test
@@ -30,13 +31,15 @@ class MemberTest {
         // GIVEN
         EmailAddress emailAddress = new EmailAddress("test@example.com");
         String password = "password";
+        Cafe cafe = new Cafe();
 
         // WHEN
-        Member customer = Member.createOwner(emailAddress, password);
+        Member customer = Member.createOwner(emailAddress, password, cafe);
 
         // THEN
         assertThat(customer.getEmailAddress()).isEqualTo(emailAddress);
         assertThat(customer.getPassword()).isEqualTo(password);
+        assertThat(customer.getCafe()).isEqualTo(cafe);
         assertThat(customer.getRoles()).containsExactly(Role.OWNER);
     }
 

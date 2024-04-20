@@ -18,6 +18,19 @@ spec:
         - name: key-pair
           secret:
             secretName: {{ .Chart.Name }}
+      initContainers:
+        - name: wait-for-db
+          image: busybox
+          command:
+            - sh
+            - '-c'
+            - |
+              echo -e "Checking for the availability of MySQL Server deployment";
+              while ! nc -z {{ .Values.mysql.fullnameOverride }}-headless 3306;
+                do sleep 1;
+                printf "-";
+              done;
+              echo -e "  >> MySQL DB Server has started";
       containers:
         - name: {{ .Chart.Name }}
           image: {{ required "image.repository is required" .Values.image.repository }}:{{ .Values.image.tag | default "latest" }}

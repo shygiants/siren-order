@@ -17,3 +17,8 @@ logging:
   level:
     org.hibernate.SQL: debug
     org.hibernate.type: trace
+
+
+security:
+  keypair:
+    generateIfNotExist: true

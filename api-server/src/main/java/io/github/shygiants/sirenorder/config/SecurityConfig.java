@@ -28,6 +28,8 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtGra
 import org.springframework.security.web.SecurityFilterChain;
 
 import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.time.Duration;
@@ -38,11 +40,14 @@ import java.util.UUID;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Value("${security.keypair.privatekey}")
+    @Value("${security.keypair.privatekey:}")
     private String privateKeyPath;
 
-    @Value("${security.keypair.publickey}")
+    @Value("${security.keypair.publickey:}")
     private String publicKeyPath;
+
+    @Value("${security.keypair.generateIfNotExist:false}")
+    private Boolean generateIfNotExist;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -88,9 +93,19 @@ public class SecurityConfig {
     }
 
     @Bean
-    public KeyPair keyPair() {
-        KeyPairLoader keyPairLoader = new KeyPairLoader(privateKeyPath, publicKeyPath);
-        return keyPairLoader.load();
+    public KeyPair keyPair() throws NoSuchAlgorithmException {
+        try {
+            KeyPairLoader keyPairLoader = new KeyPairLoader(privateKeyPath, publicKeyPath);
+            return keyPairLoader.load();
+        } catch (Exception e) {
+            if (!generateIfNotExist) {
+                throw e;
+            }
+
+            KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+            keyPairGenerator.initialize(2048);
+            return keyPairGenerator.generateKeyPair();
+        }
     }
 
     @Bean

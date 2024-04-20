@@ -2,12 +2,12 @@ package io.github.shygiants.sirenorder.domain.service;
 
 import io.github.shygiants.sirenorder.domain.entity.Cafe;
 import io.github.shygiants.sirenorder.domain.repository.CafeRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 
@@ -32,7 +32,7 @@ class CafeServiceTest {
         Cafe cafe = cafeService.getCafe();
 
         // THEN
-        Assertions.assertThat(cafe.getId()).isEqualTo(CafeService.CAFE_ID);
+        assertThat(cafe.getId()).isEqualTo(CafeService.CAFE_ID);
         verify(cafeRepository).findById(CafeService.CAFE_ID);
     }
 
@@ -46,7 +46,7 @@ class CafeServiceTest {
         Cafe cafe = cafeService.getCafe();
 
         // THEN
-        Assertions.assertThat(cafe.getId()).isEqualTo(CafeService.CAFE_ID);
+        assertThat(cafe.getId()).isEqualTo(CafeService.CAFE_ID);
         verify(cafeRepository).findById(CafeService.CAFE_ID);
         verify(cafeRepository).save(argThat(arg -> arg.getId().equals(CafeService.CAFE_ID)));
     }

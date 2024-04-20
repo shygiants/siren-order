@@ -4,20 +4,24 @@ import io.github.shygiants.sirenorder.domain.entity.Cafe;
 import io.github.shygiants.sirenorder.domain.service.CafeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Mockito.*;
 
 class CafeControllerTest {
     CafeController cafeController;
     CafeService cafeService;
+    ControllerExceptionHandler controllerExceptionHandler;
 
     @BeforeEach
     void setup() {
         cafeService = mock(CafeService.class);
         cafeController = new CafeController(cafeService);
+        controllerExceptionHandler = new ControllerExceptionHandler();
     }
 
     @Test
@@ -30,8 +34,24 @@ class CafeControllerTest {
         .when()
             .get("/api/v1/cafe")
         .then()
-            .statusCode(200)
+            .status(HttpStatus.OK)
             .body("open", notNullValue());
+        verify(cafeService).getCafe();
+    }
+
+    @Test
+    void testGetCafeRuntimeException() {
+        String message = "message";
+        when(cafeService.getCafe()).thenThrow(new RuntimeException(message));
+
+        given()
+            .standaloneSetup(cafeController, controllerExceptionHandler)
+            .contentType(MediaType.APPLICATION_JSON)
+        .when()
+            .get("/api/v1/cafe")
+        .then()
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body("msg", equalTo(message));
         verify(cafeService).getCafe();
     }
 }

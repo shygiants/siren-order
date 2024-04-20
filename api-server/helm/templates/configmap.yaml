@@ -9,3 +9,5 @@ data:
   SPRING_DATASOURCE_DRIVERCLASSNAME: "com.mysql.cj.jdbc.Driver"
   SPRING_DATASOURCE_URL: "jdbc:mysql://{{ .Values.mysql.fullnameOverride }}-headless:3306/{{ .Values.mysql.auth.database }}"
   SPRING_DATASOURCE_USERNAME: "root"
+  SECURITY_KEYPAIR_PRIVATEKEY: "{{ .Values.security.keyPairDir }}/private-key"
+  SECURITY_KEYPAIR_PUBLICKEY: "{{ .Values.security.keyPairDir }}/public-key"

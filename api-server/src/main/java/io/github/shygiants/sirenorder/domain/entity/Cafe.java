@@ -7,8 +7,6 @@ import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -17,14 +15,22 @@ import org.springframework.security.core.context.SecurityContextHolder;
 public class Cafe {
     @Id
     private Long id;
-    private Boolean open;
+    private Boolean isOpen;
     @OneToOne(mappedBy = "cafe")
     private Member owner;
 
     public static Cafe fromId(Long id) {
         Cafe cafe = new Cafe();
         cafe.id = id;
-        cafe.open = false;
+        cafe.isOpen = false;
         return cafe;
+    }
+
+    public void open() {
+        isOpen = true;
+    }
+
+    public void close() {
+        isOpen = false;
     }
 }

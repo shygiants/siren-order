@@ -41,6 +41,7 @@ class MemberTest {
         assertThat(customer.getPassword()).isEqualTo(password);
         assertThat(customer.getCafe()).isEqualTo(cafe);
         assertThat(customer.getRoles()).containsExactly(Role.OWNER);
+        assertThat(customer.hasAuthorityTo(cafe)).isTrue();
     }
 
     @Test

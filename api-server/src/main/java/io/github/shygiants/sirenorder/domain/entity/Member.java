@@ -58,6 +58,10 @@ public class Member {
         }
     }
 
+    public boolean hasAuthorityTo(Cafe cafe) {
+        return this.cafe.equals(cafe) && roles.contains(Role.OWNER);
+    }
+
     public static Member createCustomer(EmailAddress emailAddress, String password) {
         return new Member(emailAddress, password, Set.of(Role.CUSTOMER));
     }

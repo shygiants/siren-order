@@ -17,6 +17,30 @@ class CafeTest {
 
         // THEN
         assertThat(cafe.getId()).isEqualTo(CAFE_ID);
-        assertThat(cafe.getOpen()).isFalse();
+        assertThat(cafe.getIsOpen()).isFalse();
+    }
+
+    @Test
+    void testOpen() {
+        // GIVEN
+        Cafe cafe = Cafe.fromId(1L);
+
+        // WHEN
+        cafe.open();
+
+        // THEN
+        assertThat(cafe.getIsOpen()).isTrue();
+    }
+
+    @Test
+    void testClose() {
+        // GIVEN
+        Cafe cafe = Cafe.fromId(1L);
+
+        // WHEN
+        cafe.close();
+
+        // THEN
+        assertThat(cafe.getIsOpen()).isFalse();
     }
 }

@@ -1,10 +1,10 @@
 package io.github.shygiants.sirenorder.domain.service;
 
 import io.github.shygiants.sirenorder.domain.entity.Cafe;
+import io.github.shygiants.sirenorder.domain.entity.Member;
 import io.github.shygiants.sirenorder.domain.repository.CafeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -15,9 +15,36 @@ public class CafeService {
 
     private final CafeRepository cafeRepository;
 
-    @Transactional
     public Cafe getCafe() {
         Optional<Cafe> cafeOptional = cafeRepository.findById(CAFE_ID);
         return cafeOptional.orElseGet(() -> cafeRepository.save(Cafe.fromId(CAFE_ID)));
+    }
+
+    private void checkAuthority(Member requester, Cafe cafe) {
+        if (!requester.hasAuthorityTo(cafe)) {
+            throw new NoAuthorityException(requester);
+        }
+    }
+
+    public void openCafe(Member requester) {
+        Cafe cafe = getCafe();
+        checkAuthority(requester, cafe);
+
+        cafe.open();
+        cafeRepository.save(cafe);
+    }
+
+    public void closeCafe(Member requester) {
+        Cafe cafe = getCafe();
+        checkAuthority(requester, cafe);
+
+        cafe.close();
+        cafeRepository.save(cafe);
+    }
+
+    public static class NoAuthorityException extends IllegalCallerException {
+        public NoAuthorityException(Member member) {
+            super("Requester " + member.getEmailAddress() + " has no authority");
+        }
     }
 }

@@ -14,7 +14,6 @@ class EmailAddressConverterTest {
         // GIVEN
         EmailAddress emailAddress = new EmailAddress("test@example.com");
 
-
         // WHEN
         String converted = converter.convertToDatabaseColumn(emailAddress);
         EmailAddress reconstructed = converter.convertToEntityAttribute(converted);

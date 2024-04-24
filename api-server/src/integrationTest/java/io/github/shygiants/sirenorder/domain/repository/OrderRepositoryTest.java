@@ -11,7 +11,6 @@ import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -52,6 +51,6 @@ class OrderRepositoryTest {
         entityManager.close();
 
         Optional<Order> orderOptional = orderRepository.findById(saved.getId());
-        assertThat(orderOptional).hasValue(order);
+        assertThat(orderOptional).hasValue(saved);
     }
 }

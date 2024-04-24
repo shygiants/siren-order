@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EqualsAndHashCode
+@EqualsAndHashCode(exclude = "createdAt")
 @EntityListeners(AuditingEntityListener.class)
 @Table(name = "ORDERS")
 public class Order {

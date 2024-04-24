@@ -15,7 +15,9 @@ import lombok.NoArgsConstructor;
 public class Cafe {
     @Id
     private Long id;
+
     private Boolean isOpen;
+
     @OneToOne(mappedBy = "cafe")
     private Member owner;
 
